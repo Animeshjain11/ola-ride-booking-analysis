@@ -1,18 +1,45 @@
 # OLA Ride Booking Analysis
 
-A SQL and Power BI portfolio project exploring ride-booking performance, vehicle types, cancellations, payment methods, revenue, and customer/driver ratings.
-
-## Project overview
-
-This project uses booking-level data to answer operational and business questions about ride-hailing performance. The SQL script creates reusable views for common analyses.
+Analysed **103,024 OLA ride bookings (July 2024)** using **MySQL** and **Power BI** to understand cancellations, revenue, vehicle-type performance and customer/driver ratings.
 
 ## Tools
 
-- MySQL
-- SQL views and aggregate queries
-- Power BI report source archive (included under `powerbi/`)
+- MySQL (views, aggregate queries)
+- Power BI (5-page interactive dashboard, DAX measures)
 
-## Business questions explored
+## Dashboard Preview
+
+| Overall | Vehicle Type |
+|---|---|
+| ![Overall](images/overall.png) | ![Vehicle Type](images/vehicle_type.png) |
+
+| Revenue | Cancellation |
+|---|---|
+| ![Revenue](images/revenue.png) | ![Cancellation](images/cancellation.png) |
+
+| Ratings |
+|---|
+| ![Ratings](images/ratings.png) |
+
+## Key Insights (July 2024)
+
+- **103,024 bookings**, of which **63,967 (62.09%) were successful**, worth about **35M**.
+- **28.08% cancellation rate** (28,933 cancelled rides): 18.43K cancelled by drivers and 10.5K by customers. Another 10.12K bookings ended with "Driver Not Found".
+- **Top customer cancellation reason:** driver not moving towards pickup (30.24%), followed by the driver asking to cancel (25.43%).
+- **Top driver cancellation reason:** personal and car-related issues (35.49%), then customer-related issues (29.36%).
+- **Payments:** Cash (~19M) and UPI (~14M) make up almost all revenue. Card payments are small.
+- **Vehicle types:** Prime Sedan has the highest successful booking value (5.22M). Auto trips are much shorter (avg ~10 km) than other types (avg ~25 km).
+- **Ratings:** driver and customer ratings are about 4.0 across all vehicle types.
+
+## Dataset
+
+- Source: _add dataset link here (e.g. Kaggle)_
+- Period: 01-07-2024 to 31-07-2024
+- Main columns: `Date`, `Time`, `Booking_ID`, `Booking_Status`, `Customer_ID`, `Vehicle_Type`, `Pickup_Location`, `Drop_Location`, `V_TAT`, `C_TAT`, `Canceled_Rides_by_Customer`, `Canceled_Rides_by_Driver`, `Incomplete_Rides`, `Incomplete_Rides_Reason`, `Booking_Value`, `Payment_Method`, `Ride_Distance`, `Driver_Ratings`, `Customer_Rating`
+
+## SQL Analysis
+
+`sql/ola.sql` creates the `OLA` database, runs data quality checks, and builds 15 views (10 basic and 5 advanced using CTEs and window functions). The basic views answer:
 
 1. Which bookings were successful?
 2. What is the average ride distance by vehicle type?
@@ -25,40 +52,45 @@ This project uses booking-level data to answer operational and business question
 9. What is the total booking value of successful rides?
 10. What are the reasons for incomplete rides?
 
-## Repository structure
+The advanced views cover cancellation rate by vehicle type, top customers by spend (with `RANK()`), daily bookings with a 7-day moving average, revenue share by payment method, and customer cancellation reasons.
+
+## Power BI Dashboard
+
+Five pages: **Overall, Vehicle Type, Revenue, Cancellation, Ratings**, with a date slicer on each page.
+
+Custom DAX measures:
+
+```DAX
+CanceledBookings =
+CALCULATE(
+    COUNTROWS(July),
+    July[Booking_Status] IN {"Canceled by Driver", "Canceled by Customer"}
+)
+
+CanceledPercentage =
+DIVIDE([CanceledBookings], [TotalBooking], 0)
+```
+
+## Repository Structure
 
 ```text
 ola-ride-booking-analysis/
 ├── README.md
 ├── sql/
 │   └── ola.sql
-└── powerbi/
-    └── ola_dashboard_source.zip
+├── powerbi/
+│   └── ola.pbix
+└── images/
+    ├── overall.png
+    ├── vehicle_type.png
+    ├── revenue.png
+    ├── cancellation.png
+    └── ratings.png
 ```
 
-## How to run the SQL
+## How to Run
 
 1. Install MySQL Server and MySQL Workbench.
-2. Open `sql/ola.sql` in MySQL Workbench.
-3. Ensure your database contains a table named `BOOKINGS` with the columns referenced in the script.
-4. Run the script. It creates the `OLA` database and views for the analyses.
-5. Review each view using the `SELECT` statements included in the script.
-
-> Important: the SQL file does not include the source dataset or table-creation/import steps. Add a data dictionary and safe, shareable sample data or instructions for obtaining the dataset so another person can reproduce the analysis.
-
-## Power BI report
-
-The `powerbi/ola_dashboard_source.zip` file preserves the dashboard source archive supplied with this project. It contains report-definition files for five pages: Overall, Vehicle Type, Revenue, Cancellation, and Ratings. It is not a standard `.pbix` file, so it may not open directly in Power BI Desktop. If you have the original `.pbix`, add that file instead (or alongside this archive) so reviewers can open the report.
-
-## Current limitations and next improvements
-
-- Add data import/table schema instructions and a data dictionary.
-- Add data-quality checks for nulls, duplicates, and inconsistent booking statuses.
-- Add advanced SQL analyses using CTEs, window functions, and month-over-month trends if the dataset has suitable date fields.
-- Document findings with actual numbers from query results; do not add unverified business claims.
-- Add dashboard screenshots to the README.
-- Make the script safely rerunnable by handling existing views (for example, `CREATE OR REPLACE VIEW` where supported or dropping views first).
-
-## Project status
-
-Portfolio project in progress. Findings and metrics should be added after running the queries against the final dataset.
+2. Import the dataset CSV into a table named `BOOKINGS` using MySQL Workbench's Table Data Import Wizard.
+3. Run `sql/ola.sql` to create the database and views.
+4. Open `powerbi/ola.pbix` in Power BI Desktop to explore the dashboard.
