@@ -11,15 +11,15 @@ Analysed **103,024 OLA ride bookings (July 2024)** using **MySQL** and **Power B
 
 | Overall | Vehicle Type |
 |---|---|
-| ![Overall](images/overall.png) | ![Vehicle Type](images/vehicle_type.png) |
+| ![Overall](Overall.png) | ![Vehicle Type](vehicle_type.png) |
 
 | Revenue | Cancellation |
 |---|---|
-| ![Revenue](images/revenue.png) | ![Cancellation](images/cancellation.png) |
+| ![Revenue](Revenue.png) | ![Cancellation](cancellation.png) |
 
 | Ratings |
 |---|
-| ![Ratings](images/ratings.png) |
+| ![Ratings](Ratings.png) |
 
 ## Key Insights (July 2024)
 
